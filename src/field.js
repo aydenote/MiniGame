@@ -1,75 +1,75 @@
 'use strict';
 
-export default class Field{
-    constructor(){
+import * as sound from './sound.js';
+
+export const ItemType = Object.freeze({
+    carrot: 'carrot',
+    bug: 'bug'
+})
+
+const Carrot__size = 120;
+
+export class Field{
+    constructor(carrotCount, bugCount){
+        this.carrotCount = carrotCount;
+        this.bugCount = bugCount;
+
         this.field = document.querySelector('.game__field');
         this.fieldRect = this.field.getBoundingClientRect();
 
-        field.addEventListener('click', ()=> {
-            this.onClick && this.onClick();
-
-            
-        });
+        this.field.addEventListener('click', (event)=>{this.onClick(event)});
     }
 
-    setClickListener(event){
+    init(){
+        this.field.innerHTML = '';
+        this._addItem(ItemType.carrot, this.carrotCount, '/img/carrot.png');
+        this._addItem(ItemType.bug, this.bugCount, '/img/bug.png');
+    }
+
+    setClickListener(onItemClick){
+        this.onItemClick = onItemClick;
+    }
+
+    _addItem(className, count, imgPath){
+        const x1 = 0;
+        const y1 = 0;
+        const x2 = this.fieldRect.width - Carrot__size;
+        const y2 = this.fieldRect.height - Carrot__size;
     
-        if(!stared){
-            return;
+        for(let i = 0; i<count; i++){
+            const item = document.createElement('img')
+            item.setAttribute('class', className);
+            item.setAttribute('src', imgPath);
+            item.style.position = 'absolute';
+            
+            const x = randomNumber(x1, x2);
+            const y = randomNumber(y1, y2);
+            item.style.left = `${x}px`;
+            item.style.top = `${y}px`;
+    
+            this.field.appendChild(item);
+    
         }
-    
+    }
+
+    onClick(event){
         const target = event.target;
         if(target.matches('.carrot')){
             // 당근
             target.remove();
-            score++;
-            updateScoreBoard();
-            
-            carrot_audio.play();
-    
-            if(score === Carrot__count){
-                finishGame(true);
-                stopGameTimer();
-            }
+            sound.playCarrot();
+            this.onItemClick && this.onItemClick(ItemType.carrot);
+
+
+
         } else if(target.matches('.bug')){
             // 벌레
-            stopGameTimer();
-            finishGame(false);
-            bug_audio.play();
-        }
-    }
-    onFieldClick(event){
-    
-        if(!stared){
-            return;
-        }
-    
-        const target = event.target;
-        if(target.matches('.carrot')){
-            // 당근
-            target.remove();
-            score++;
-            updateScoreBoard();
-            
-            carrot_audio.play();
-    
-            if(score === Carrot__count){
-                finishGame(true);
-                stopGameTimer();
-            }
-        } else if(target.matches('.bug')){
-            // 벌레
-            stopGameTimer();
-            finishGame(false);
-            bug_audio.play();
+            this.onItemClick && this.onItemClick(ItemType.bug);
+            sound.playBug()
         }
     }
 }
 
-function audioStop(){
-    win_audio.pause();
-    carrot_audio.pause();
-    bug_audio.pause();
-    bg_audio.pause();
-    alert_audio.pause();
+function randomNumber(min,  max){
+    return Math.random() * (max - min) + min;
 }
