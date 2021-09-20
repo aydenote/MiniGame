@@ -11,7 +11,7 @@
       crossorigin="anonymous"
     />
 
-    <script src="main.js" defer></script>
+    <script type="module" src="main.js" defer></script>
     <link rel="stylesheet" href="style.css" />
     <title>Game</title>
   </head>
@@ -22,10 +22,11 @@
           <i class="fas fa-play" id="play"></i>
         </button>
         <span class="game__timer"></span>
-        <span class="game__score">9</span>
+        <span class="game__score"></span>
       </header>
       <section class="game__field"></section>
     </section>
+
     <section class="pop-up pop-up--hide">
       <button class="pop-up__refresh">
         <i class="fas fa-redo"></i>

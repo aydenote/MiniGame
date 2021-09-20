@@ -1,90 +1,96 @@
 'use strict';
 
+import Field from './src/field.js';
+import Game from './src/game.js';
+import PopUp from './src/popup.js';
+
 const Carrot__size = 120;
 const Carrot__count = 20;
 const Bug__count = 20;
-const Game__SEC = 20;
 
-const field = document.querySelector('.game__field');
-const fieldRect = field.getBoundingClientRect();
+let stared = false;
 
-const gameBtn = document.querySelector('.game__button')
-const gameTimer = document.querySelector('.game__timer')
-const gameScore = document.querySelector('.game__score')
-const popUp = document.querySelector('.pop-up');
-const popUpText = document.querySelector('.pop-up__message');
-const popUpRefresh = document.querySelector('.pop-up__refresh');
-
-const win_audio = new Audio('/sound/game_win.mp3');
+// const win_audio = new Audio('/sound/game_win.mp3');
 const bg_audio = new Audio('/sound/bg.mp3')
 const carrot_audio = new Audio('/sound/carrot_pull.mp3')
 const bug_audio = new Audio('/sound/bug_pull.mp3')
-const alert_audio = new Audio('/sound/alert.wav')
+// const alert_audio = new Audio('/sound/alert.wav')
 
-let stared = false;
-let score = 0;
-let timer = undefined;
+const popup = new PopUp();
+const game = new Game();
+const field = new Field();
 
-field.addEventListener('click', onFieldClick);
-gameBtn.addEventListener('click', ()=> {
+const popUpRefresh = document.querySelector('.pop-up__refresh');
+
+// field.addEventListener('click', onFieldClick);
+
+game.setClickListener(()=>{
     if(stared){
-        stopGame();
+        game.stopGame();
     } else {
-        startGame();
+        game.startGame();
     }
+})
+// gameBtn.addEventListener('click', ()=> {
+//     if(stared){
+//         game.stopGame();
+//     } else {
+//         game.startGame();
+//     }
     
-});
+// });
+
 
 popUpRefresh.addEventListener('click', ()=>{
     startGame();
-    hidePopUp();
+    popup.hide();
     showGameButton();
 });
 
-function startGame(){
-    stared = true;
-    initGame();
-    showstartButton();
-    showTimerAndScore();
-    startGameTimer();
-}
+// function startGame(){
+//     stared = true;
+//     initGame();
+//     showstartButton();
+//     showTimerAndScore();
+//     startGameTimer();
+// }
 
-function stopGame(){
-    stared = false;
-    stopGameTimer();
-    hideGameButton();
-    showPopUpWithText('REPLAY❓');
+// function stopGame(){
+//     stared = false;
+//     stopGameTimer();
+//     hideGameButton();
+//     popup.showWithText('REPLAY❓');
 
-    audioStop();
-    alert_audio.play();
-}
+//     audioStop();
+//     alert_audio.play();
+// }
 
-function finishGame(win){
-    stared = false;
-    hideGameButton();
-    showPopUpWithText(win? 'YOU WON 🍗' : 'YOU LOST 😥');
+// function finishGame(win){
+//     stared = false;
+//     hideGameButton();
+//     popup.showWithText(win? 'YOU WON 🍗' : 'YOU LOST 😥');
     
-    audioStop();
+//     audioStop();
 
-    if(win===true){
-        win_audio.play();
-    } else {
-        alert_audio.play();
-    }
-    }
+//     if(win===true){
+//         win_audio.play();
+//     } else {
+//         alert_audio.play();
+//     }
+//     }
 
-function audioStop(){
-    win_audio.pause();
-    carrot_audio.pause();
-    bug_audio.pause();
-    bg_audio.pause();
-    alert_audio.pause();
-}
+// function audioStop(){
+//     win_audio.pause();
+//     carrot_audio.pause();
+//     bug_audio.pause();
+//     bg_audio.pause();
+//     alert_audio.pause();
+// }
 
-function showTimerAndScore(){
-    gameTimer.style.visibility = 'visible';
-    gameScore.style.visibility = 'visible';
-}
+// function showTimerAndScore(){
+//     gameTimer.style.visibility = 'visible';
+//     gameScore.style.visibility = 'visible';
+// }
 function showstartButton(){
     const icon = gameBtn.querySelector('#play');
     icon.classList.remove('fa-play');
@@ -125,55 +131,56 @@ function updateTimerText(time){
     gameTimer.innerText = `${minutes}:${seconds}`
 }
 
-function showPopUpWithText(text){
-    popUpText.innerText = text;
-    popUp.classList.remove('pop-up--hide')
+// function showPopUpWithText(text){
+//     popUpText.innerText = text;
+//     popUp.classList.remove('pop-up--hide')
     
-}
+// }
 
-function hidePopUp(){
-    popUp.classList.add('pop-up--hide')
-}
+// function hidePopUp(){
+//     popUp.classList.add('pop-up--hide')
+// }
 
-function initGame(){
-    field.innerHTML = '';
-    score = 0;
-    gameScore.innerText = Carrot__count;
+// function initGame(){
+//     field.innerHTML = '';
+//     score = 0;
+//     gameScore.innerText = Carrot__count;
        
 
-    // 벌레와 당근 생성 및 field에 추가
+//     // 벌레와 당근 생성 및 field에 추가
     
-    addItem('carrot', Carrot__count, '/img/carrot.png');
-    addItem('bug', Bug__count, '/img/bug.png');
+//     addItem('carrot', Carrot__count, '/img/carrot.png');
+//     addItem('bug', Bug__count, '/img/bug.png');
 
-    bg_audio.play();
-}
-function onFieldClick(event){
+//     bg_audio.play();
+// }
+
+// function onFieldClick(event){
     
-    if(!stared){
-        return;
-    }
+//     if(!stared){
+//         return;
+//     }
 
-    const target = event.target;
-    if(target.matches('.carrot')){
-        // 당근
-        target.remove();
-        score++;
-        updateScoreBoard();
+//     const target = event.target;
+//     if(target.matches('.carrot')){
+//         // 당근
+//         target.remove();
+//         score++;
+//         updateScoreBoard();
         
-        carrot_audio.play();
+//         carrot_audio.play();
 
-        if(score === Carrot__count){
-            finishGame(true);
-            stopGameTimer();
-        }
-    } else if(target.matches('.bug')){
-        // 벌레
-        stopGameTimer();
-        finishGame(false);
-        bug_audio.play();
-    }
-}
+//         if(score === Carrot__count){
+//             finishGame(true);
+//             stopGameTimer();
+//         }
+//     } else if(target.matches('.bug')){
+//         // 벌레
+//         stopGameTimer();
+//         finishGame(false);
+//         bug_audio.play();
+//     }
+// }
 
 function updateScoreBoard(){
     gameScore.innerText = Carrot__count - score;
